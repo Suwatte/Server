@@ -1,0 +1,21 @@
+{
+  "name": "suwatte-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/app.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "Mantton",
+  "license": "ISC",
+  "devDependencies": {
+    "prisma": "^3.12.0",
+    "typescript": "^4.6.3"
+  },
+  "dependencies": {
+    "@prisma/client": "^3.12.0",
+    "chalk": "^5.0.1",
+    "express": "^4.17.3",
+    "morgan": "^1.10.0",
+    "redis": "^4.0.6"
+  }
+}
