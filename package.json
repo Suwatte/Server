@@ -9,9 +9,12 @@
   "scripts": {
     "start": "tsc && node ./dist/server.js",
     "dev": "nodemon",
-    "populate": "tsc && node ./dist/jobs/populate/index.js"
+    "populate": "tsc && node ./dist/jobs/populate"
   },
-  "keywords": [],
+  "keywords": [
+    "prisma",
+    "suwatte"
+  ],
   "author": "Mantton",
   "license": "ISC",
   "devDependencies": {

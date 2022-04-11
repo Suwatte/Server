@@ -1,6 +1,8 @@
 import axios from "axios";
 import { Parser, StoredContent, StoredTag } from "../../../types";
-import { capitalize } from "lodash";
+import { capitalize, map, toPairs } from "lodash";
+import { logger } from "../../../utils/logger";
+import { sleep } from "../../../utils/sleep";
 const API_URL = "https://api.mangadex.org";
 const COVER_URL = "https://uploads.mangadex.org/covers";
 const ADULT_TAGS = [
@@ -8,7 +10,11 @@ const ADULT_TAGS = [
   "97893a4c-12af-4dac-b6be-0dffb353568e",
   "5bd0e105-4481-44ca-b6e7-7544da56b1a3",
 ];
-const getResults = async (page: number): Promise<StoredContent[]> => {
+const SOURCE_ID = "org.mangadex";
+const getResultsForTag = async (
+  page: number,
+  tagId: string
+): Promise<StoredContent[]> => {
   let offset = page * 100;
   const response = await axios.get(API_URL + "/manga", {
     params: {
@@ -17,6 +23,7 @@ const getResults = async (page: number): Promise<StoredContent[]> => {
       "order[followedCount]": "desc",
       contentRating: ["safe", "suggestive", "erotica", "pornographic"],
       limit: 100,
+      includedTags: [tagId],
     },
   });
   const data: any[] = response.data.data;
@@ -96,7 +103,7 @@ const getResults = async (page: number): Promise<StoredContent[]> => {
     }
 
     return {
-      sourceId: "org.mangadex",
+      sourceId: SOURCE_ID,
       contentId: entry.id,
       title: attributes.title[Object.keys(attributes.title)[0]],
       coverImage,
@@ -107,6 +114,34 @@ const getResults = async (page: number): Promise<StoredContent[]> => {
 };
 
 export const MangaDex: Parser = {
-  sourceId: "org.mangadex",
-  getResults: getResults,
+  sourceId: SOURCE_ID,
+  getResults: async (callback) => {
+    const PAGE_LIMIT = 20;
+    let iteration = 0;
+
+    // Get All Tags
+    const tags: string[] = [];
+    const response = await axios.get(API_URL + "/manga/tag");
+    const mapped: string[] = response.data.data.map((v: any) => v.id);
+    tags.push(...mapped);
+
+    // Loop through
+    for (const tag of tags) {
+      iteration = 0;
+      logger.debug(`Working on Tag: ${tag}`);
+      while (iteration <= PAGE_LIMIT) {
+        try {
+          const result = await getResultsForTag(iteration, tag);
+          callback(result);
+          await sleep(1000); // hacky rate limit
+          iteration++;
+        } catch (err: any) {
+          logger.error(err.message);
+          break;
+        }
+      }
+    }
+
+    logger.info(`\n\nCompleted ${SOURCE_ID}`);
+  },
 };
