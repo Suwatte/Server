@@ -6,7 +6,6 @@ import { REDIS_HOST } from "../utils/secrets";
 const store = (() => {
   const client = createClient({
     url: REDIS_HOST,
-    legacyMode: true,
   });
 
   return client;

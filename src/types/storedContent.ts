@@ -12,3 +12,13 @@ export interface StoredTag {
   id: string;
   adult: boolean;
 }
+
+export interface Highlight extends StoredContent {
+  pct: number;
+}
+
+export interface Collection {
+  results: Highlight[];
+  page: number;
+  isLastPage: boolean;
+}

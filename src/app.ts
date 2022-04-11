@@ -4,7 +4,7 @@ import cors from "cors";
 import compression from "compression";
 import store from "./helpers/redis";
 import { badRouteHandler, errorHandler } from "./helpers";
-
+import router from "./routes/similar";
 const app = express();
 
 // Connect Services
@@ -17,7 +17,7 @@ app.use(compression());
 app.use(cors());
 
 // Routes
-
+app.use("/similar", router);
 // Default Handlers
 app.use(errorHandler);
 app.use("*", badRouteHandler);
