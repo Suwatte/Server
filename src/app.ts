@@ -2,8 +2,13 @@ import express from "express";
 import helmet from "helmet";
 import cors from "cors";
 import compression from "compression";
+import store from "./helpers/redis";
+import { badRouteHandler, errorHandler } from "./helpers";
 
 const app = express();
+
+// Connect Services
+store.connect();
 
 // Middleware
 app.use(helmet());
@@ -14,9 +19,6 @@ app.use(cors());
 // Routes
 
 // Default Handlers
-
-app.use("*", (req, res) => {
-  res.status(404).send({ msg: "not found" });
-});
-
+app.use(errorHandler);
+app.use("*", badRouteHandler);
 export default app;

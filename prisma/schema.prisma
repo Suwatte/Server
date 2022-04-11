@@ -17,9 +17,10 @@ model Content {
     contentId  String
     coverImage String
     title      String
+    popularity Int
+    linkedTags ContentTag[]
 
-    ContentTag ContentTag[]
-    @@unique([sourceId, contentId], name: "id", map: "id")
+    @@unique([sourceId, contentId], name: "id")
     @@map("contents")
 }
 
@@ -29,6 +30,7 @@ model Tag {
     label        String
     adultContent Boolean @default(false)
 
+    linkedContents ContentTag[]
     @@unique([sourceId, tagId], name: "id")
     @@map("tags")
 }
@@ -39,5 +41,6 @@ model ContentTag {
     contentId String
 
     content Content @relation(fields: [sourceId, contentId], references: [sourceId, contentId])
-    @@unique([tagId, sourceId, contentId])
+    tag     Tag     @relation(fields: [sourceId, tagId], references: [sourceId, tagId])
+    @@unique([tagId, sourceId, contentId], name: "id")
 }
